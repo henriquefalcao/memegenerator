@@ -10,17 +10,35 @@
       text-align: center;
       background-color: #f0f0f0;
       padding: 2rem;
+      margin: 0;
     }
+
+    h1 {
+      font-size: 1.8rem;
+    }
+
     canvas {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
       border: 2px solid #333;
       margin-top: 1rem;
       background-color: white;
     }
+
     button {
       margin-top: 1rem;
-      padding: 0.5rem 1rem;
+      padding: 0.75rem 1.5rem;
       font-size: 1rem;
       cursor: pointer;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #555;
     }
   </style>
 </head>
@@ -64,35 +82,37 @@
       const texto = frases[Math.floor(Math.random() * frases.length)];
       const imagemUrl = imagens[Math.floor(Math.random() * imagens.length)];
 
-      imagem.crossOrigin = "anonymous"; // para evitar problemas de CORS
+      imagem.crossOrigin = "anonymous";
       imagem.src = imagemUrl;
+
       imagem.onload = () => {
+        // Redimensionar canvas para manter proporção responsiva
+        canvas.width = imagem.width > 500 ? 500 : imagem.width;
+        canvas.height = imagem.height > 500 ? 500 : imagem.height;
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(imagem, 0, 0, canvas.width, canvas.height);
 
-        ctx.font = '36px Impact';
+        ctx.font = 'bold 30px Impact';
         ctx.fillStyle = 'white';
         ctx.strokeStyle = 'black';
+        ctx.lineWidth = 0.1;
         ctx.textAlign = 'center';
 
-        // Quebrar texto em múltiplas linhas se necessário
         const linhas = wrapText(ctx, texto, canvas.width - 40);
 
-        // Texto na parte superior
-        let yPos = 40;
-        for (let i = 0; i < Math.floor(linhas.length / 2); i++) {
-          ctx.fillText(linhas[i], canvas.width / 2, yPos);
-          ctx.strokeText(linhas[i], canvas.width / 2, yPos);
-          yPos += 30;
-        }
+        // Texto no topo
+        linhas.forEach((linha, i) => {
+          const y = 40 + i * 30;
+          ctx.fillText(linha, canvas.width / 2, y);
+          ctx.strokeText(linha, canvas.width / 2, y);
+        });
 
-        // Texto na parte inferior
-        yPos = canvas.height - 40 - (linhas.length - Math.floor(linhas.length / 2)) * 30;
-        for (let i = Math.floor(linhas.length / 2); i < linhas.length; i++) {
-          ctx.fillText(linhas[i], canvas.width / 2, yPos);
-          ctx.strokeText(linhas[i], canvas.width / 2, yPos);
-          yPos += 30;
-        }
+        // Opcional: texto embaixo
+        /*
+        ctx.fillText('Texto embaixo', canvas.width / 2, canvas.height - 20);
+        ctx.strokeText('Texto embaixo', canvas.width / 2, canvas.height - 20);
+        */
       };
     }
 
@@ -102,22 +122,20 @@
       let line = '';
       for (let i = 0; i < words.length; i++) {
         const testLine = line + words[i] + ' ';
-        const metrics = ctx.measureText(testLine);
-        const testWidth = metrics.width;
+        const testWidth = ctx.measureText(testLine).width;
         if (testWidth > maxWidth && i > 0) {
-          lines.push(line);
+          lines.push(line.trim());
           line = words[i] + ' ';
         } else {
           line = testLine;
         }
       }
-      lines.push(line);
+      lines.push(line.trim());
       return lines;
     }
 
-    gerarMeme(); // gerar um meme ao carregar a página
+    gerarMeme();
   </script>
 </body>
 </html>
-
 
