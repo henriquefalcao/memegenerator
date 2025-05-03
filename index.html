@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gerador de Memes com Papel Higiênico</title>
   <style>
     body {
@@ -26,7 +26,7 @@
       background-color: white;
     }
 
-    button {
+    button, a.share-btn {
       margin-top: 1rem;
       padding: 0.75rem 1.5rem;
       font-size: 1rem;
@@ -35,10 +35,20 @@
       color: white;
       border: none;
       border-radius: 5px;
+      text-decoration: none;
+      display: inline-block;
     }
 
-    button:hover {
+    button:hover, a.share-btn:hover {
       background-color: #555;
+    }
+
+    a#whatsappBtn {
+      background-color: #25d366;
+    }
+
+    a#whatsappBtn:hover {
+      background-color: #1eb250;
     }
   </style>
 </head>
@@ -47,6 +57,10 @@
   <canvas id="memeCanvas" width="500" height="500"></canvas>
   <br>
   <button onclick="gerarMeme()">Gerar outro meme</button>
+  <br>
+  <a id="whatsappBtn" class="share-btn" href="#" target="_blank">Compartilhar no WhatsApp</a>
+  <br>
+  <button id="botaoCompartilhar">Compartilhar imagem</button>
 
   <script>
     const frases = [
@@ -86,17 +100,16 @@
       imagem.src = imagemUrl;
 
       imagem.onload = () => {
-        // Redimensionar canvas para manter proporção responsiva
         canvas.width = imagem.width > 500 ? 500 : imagem.width;
         canvas.height = imagem.height > 500 ? 500 : imagem.height;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(imagem, 0, 0, canvas.width, canvas.height);
 
-        ctx.font = 'bold 30px Impact';
+        ctx.font = 'bold 24px Impact';
         ctx.fillStyle = 'white';
         ctx.strokeStyle = 'black';
-        ctx.lineWidth = 0.1;
+        ctx.lineWidth = 1; // borda mais fina
         ctx.textAlign = 'center';
 
         const linhas = wrapText(ctx, texto, canvas.width - 40);
@@ -108,11 +121,8 @@
           ctx.strokeText(linha, canvas.width / 2, y);
         });
 
-        // Opcional: texto embaixo
-        /*
-        ctx.fillText('Texto embaixo', canvas.width / 2, canvas.height - 20);
-        ctx.strokeText('Texto embaixo', canvas.width / 2, canvas.height - 20);
-        */
+        // Atualiza o botão do WhatsApp com link
+        atualizarBotaoWhatsapp();
       };
     }
 
@@ -134,8 +144,30 @@
       return lines;
     }
 
+    function atualizarBotaoWhatsapp() {
+      const texto = encodeURIComponent("Veja esse meme com papel higiênico 🧻: " + window.location.href);
+      const link = `https://wa.me/?text=${texto}`;
+      document.getElementById('whatsappBtn').href = link;
+    }
+
+    // Compartilhamento nativo com imagem (se suportado)
+    document.getElementById('botaoCompartilhar').addEventListener('click', async () => {
+      const canvas = document.getElementById('memeCanvas');
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], 'meme.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Meme com papel higiênico',
+            text: 'Veja esse meme que acabei de gerar!',
+          });
+        } else {
+          alert("Seu navegador não suporta compartilhamento de imagem diretamente.");
+        }
+      });
+    });
+
     gerarMeme();
   </script>
 </body>
 </html>
-
