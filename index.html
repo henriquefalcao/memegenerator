@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Memes com Papel Higiênico</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+      padding: 2rem;
+    }
+    canvas {
+      border: 2px solid #333;
+      margin-top: 1rem;
+      background-color: white;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Gerador de Memes com Papel Higiênico 🧻</h1>
+  <canvas id="memeCanvas" width="500" height="500"></canvas>
+  <br>
+  <button onclick="gerarMeme()">Gerar outro meme</button>
+
+  <script>
+    const frases = [
+      'Quando só resta uma folha... 🥲',
+      'Papel higiênico: o verdadeiro herói',
+      'Você só me lembra quando tá no aperto!',
+      'Isso sim é rolo de verdade 😅',
+      'Economiza, guerreiro! 🧻🔥',
+      'Me respeita, sou item de luxo!',
+      'Pior que crise: sem papel higiênico!',
+      'Na escassez, cada folha vale ouro 💰',
+      'Sou suave, mas salvo vidas!',
+      'Rei do banheiro, humilde no trono 👑🚽',
+      'Sem mim, você não é nada!',
+      'Cuidado: uso excessivo pode causar sumiço!',
+      'Papel higiênico: o melhor amigo nas horas difíceis',
+      'Quando acaba, o desespero começa...',
+      'Tô aqui por você. Literalmente.',
+    ];
+
+    const imagens = [
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Toiletpapier_%28Gobran111%29.jpg/1200px-Toiletpapier_%28Gobran111%29.jpg',
+      'https://pbs.twimg.com/media/D3pDxvHWkAMf-7x.jpg',
+      'https://images.tcdn.com.br/img/img_prod/750752/porta_papel_higienico_adesivo_colar_na_parede_inox_df_2417_1_31c45cdab7e6c61f3c4c2f674403b436.jpg',
+      'https://img.freepik.com/fotos-premium/rolo-de-papel-higienico-de-papelao-vazio-isolado-em-um-branco_184700-1257.jpg',
+      'https://img.freepik.com/fotos-premium/um-rolo-de-papel-higienico-com-um-rosto_727939-1385.jpg'
+    ];
+
+    function gerarMeme() {
+      const canvas = document.getElementById('memeCanvas');
+      const ctx = canvas.getContext('2d');
+      const imagem = new Image();
+      const texto = frases[Math.floor(Math.random() * frases.length)];
+      const imagemUrl = imagens[Math.floor(Math.random() * imagens.length)];
+
+      imagem.crossOrigin = "anonymous"; // para evitar problemas de CORS
+      imagem.src = imagemUrl;
+      imagem.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(imagem, 0, 0, canvas.width, canvas.height);
+
+        ctx.font = '36px Impact';
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'black';
+        ctx.textAlign = 'center';
+
+        // Quebrar texto em múltiplas linhas se necessário
+        const linhas = wrapText(ctx, texto, canvas.width - 40);
+
+        // Texto na parte superior
+        let yPos = 40;
+        for (let i = 0; i < Math.floor(linhas.length / 2); i++) {
+          ctx.fillText(linhas[i], canvas.width / 2, yPos);
+          ctx.strokeText(linhas[i], canvas.width / 2, yPos);
+          yPos += 30;
+        }
+
+        // Texto na parte inferior
+        yPos = canvas.height - 40 - (linhas.length - Math.floor(linhas.length / 2)) * 30;
+        for (let i = Math.floor(linhas.length / 2); i < linhas.length; i++) {
+          ctx.fillText(linhas[i], canvas.width / 2, yPos);
+          ctx.strokeText(linhas[i], canvas.width / 2, yPos);
+          yPos += 30;
+        }
+      };
+    }
+
+    function wrapText(ctx, text, maxWidth) {
+      const words = text.split(' ');
+      const lines = [];
+      let line = '';
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+        if (testWidth > maxWidth && i > 0) {
+          lines.push(line);
+          line = words[i] + ' ';
+        } else {
+          line = testLine;
+        }
+      }
+      lines.push(line);
+      return lines;
+    }
+
+    gerarMeme(); // gerar um meme ao carregar a página
+  </script>
+</body>
+</html>
+
+
