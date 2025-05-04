@@ -14,7 +14,7 @@
     }
 
     h1 {
-      font-size: 1.8rem;
+      font-size: 2.8rem;
     }
 
     canvas {
@@ -31,16 +31,21 @@
       padding: 0.75rem 1.5rem;
       font-size: 1rem;
       cursor: pointer;
-      background-color: #333;
-      color: white;
+      background-color: #1ac6dd; /* verde vibrante */
+      color: black;
       border: none;
       border-radius: 5px;
       text-decoration: none;
       display: inline-block;
+      box-shadow: 0 5px #233952; /* sombra para efeito 3D */
+      transition: all 0.1s ease-in-out;
+      font-weight: bold;
     }
 
-    button:hover, a.share-btn:hover {
-      background-color: #555;
+    /* Efeito ao pressionar */
+    button:active, a.share-btn:active {
+      box-shadow: 0 2px #2d7033;
+      transform: translateY(3px);
     }
 
     a#whatsappBtn {
@@ -50,10 +55,16 @@
     a#whatsappBtn:hover {
       background-color: #1eb250;
     }
+
+    footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
   </style>
 </head>
 <body>
-  <h1>Gerador de Memes com Papel Higiênico 🧻</h1>
+  <h1>😅 Gerador de Memes de Papel Higiênico 🧻</h1>
   <canvas id="memeCanvas" width="500" height="500"></canvas>
   <br>
   <button onclick="gerarMeme()">Gerar outro meme</button>
@@ -64,37 +75,26 @@
 
   <script>
     const frases = [
-      'Quando só resta uma folha... 🥲',
-      'Papel higiênico: o verdadeiro herói',
-      'Você só me lembra quando tá no aperto!',
-      'Isso sim é rolo de verdade 😅',
-      'Economiza, guerreiro! 🧻🔥',
-      'Me respeita, sou item de luxo!',
-      'Pior que crise: sem papel higiênico!',
-      'Na escassez, cada folha vale ouro 💰',
-      'Sou suave, mas salvo vidas!',
-      'Rei do banheiro, humilde no trono 👑🚽',
-      'Sem mim, você não é nada!',
-      'Cuidado: uso excessivo pode causar sumiço!',
-      'Papel higiênico: o melhor amigo nas horas difíceis',
-      'Quando acaba, o desespero começa...',
-      'Tô aqui por você. Literalmente.',
+      'Quando só resta uma folha... 🥲<br>O desespero é real!',
+      'Papel higiênico: o verdadeiro herói<br>Na escassez, cada folha vale ouro 💰',
+      'Isso sim é rolo de verdade 😅<br>Sem mim, você não é nada!',
+      'Economiza, guerreiro! 🧻🔥<br>Cuidado com o fim do rolo!',
+      'Rei do banheiro 👑<br> humildade no trono🚽'
     ];
 
     const imagens = [
       'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Toiletpapier_%28Gobran111%29.jpg/1200px-Toiletpapier_%28Gobran111%29.jpg',
       'https://pbs.twimg.com/media/D3pDxvHWkAMf-7x.jpg',
       'https://images.tcdn.com.br/img/img_prod/750752/porta_papel_higienico_adesivo_colar_na_parede_inox_df_2417_1_31c45cdab7e6c61f3c4c2f674403b436.jpg',
-      'https://cdn.awsli.com.br/600x700/1341/1341932/produto/203116546/suporte-givlmg.jpg',
-      'https://github.com/henriquefalcao/memegenerator/papel-rosto-02.jpg',
-      'https://github.com/henriquefalcao/memegenerator/papel-rosto-03.jpg'
+      'https://henriquefalcao.github.io/memegenerator/imagens/papel-rosto-01.jpg',
+      'https://henriquefalcao.github.io/memegenerator/imagens/papel-rosto-03.jpg'
     ];
 
     function gerarMeme() {
       const canvas = document.getElementById('memeCanvas');
       const ctx = canvas.getContext('2d');
       const imagem = new Image();
-      const texto = frases[Math.floor(Math.random() * frases.length)];
+      const textoCompleto = frases[Math.floor(Math.random() * frases.length)];
       const imagemUrl = imagens[Math.floor(Math.random() * imagens.length)];
 
       imagem.crossOrigin = "anonymous";
@@ -107,22 +107,32 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(imagem, 0, 0, canvas.width, canvas.height);
 
-        ctx.font = 'bold 24px Impact';
+        ctx.font = 'bold 30px Impact';
         ctx.fillStyle = 'white';
         ctx.strokeStyle = 'black';
-        ctx.lineWidth = 1; // borda mais fina
+        ctx.lineWidth = 0.5;
         ctx.textAlign = 'center';
 
-        const linhas = wrapText(ctx, texto, canvas.width - 40);
+        // Separar o texto antes e depois da tag <br>
+        const [textoTopo, textoBaixo] = textoCompleto.split('<br>');
 
-        // Texto no topo
-        linhas.forEach((linha, i) => {
-          const y = 40 + i * 30;
+        // Desenhar texto na parte superior
+        const linhasTopo = wrapText(ctx, textoTopo, canvas.width - 40);
+        linhasTopo.forEach((linha, i) => {
+          const y = 40 + i * 40;
           ctx.fillText(linha, canvas.width / 2, y);
           ctx.strokeText(linha, canvas.width / 2, y);
         });
 
-        // Atualiza o botão do WhatsApp com link
+        // Desenhar texto na parte inferior
+        const linhasBaixo = wrapText(ctx, textoBaixo, canvas.width - 40);
+        linhasBaixo.forEach((linha, i) => {
+          const y = canvas.height - 40 - (linhasBaixo.length - i - 1) * 40;
+          ctx.fillText(linha, canvas.width / 2, y);
+          ctx.strokeText(linha, canvas.width / 2, y);
+        });
+
+        // Atualizar botão do WhatsApp com link
         atualizarBotaoWhatsapp();
       };
     }
@@ -170,5 +180,9 @@
 
     gerarMeme();
   </script>
+
+  <footer>
+    Criado e Desenvolvido por Caio Falcão - Maio de 2025
+  </footer>
 </body>
 </html>
